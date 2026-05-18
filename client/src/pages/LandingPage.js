@@ -52,6 +52,11 @@ function LandingPage() {
             <p className="text-gray-500">Apply to multiple jobs and track applications in one place.</p>
           </div>
 
+          <div className="bg-blue-50 rounded-2xl p-8 text-center flex-1">
+            <div className="text-4xl mb-4">📈</div>
+            <h4 className="text-xl font-bold text-gray-800 mb-2">Track Applications</h4>
+            <p className="text-gray-500">See all your job applications and their status in one dashboard.</p>
+          </div>
         </div>
       </div>
 
