@@ -1,12 +1,22 @@
+import { useNavigate } from 'react-router-dom';
+
 function LandingPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gray-50">
 
       <nav className="bg-white shadow-sm px-8 py-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-blue-600">JobAI 🚀</h1>
         <div className="flex gap-4">
-          <button className="text-gray-600 hover:text-blue-600 font-medium">Login</button>
-          <button className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 font-medium">
+          <button
+            onClick={() => navigate('/login')}
+            className="text-gray-600 hover:text-blue-600 font-medium">
+            Login
+          </button>
+          <button
+            onClick={() => navigate('/signup')}
+            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 font-medium">
             Sign Up
           </button>
         </div>
@@ -21,16 +31,20 @@ function LandingPage() {
           Upload your resume and get AI-powered job matches instantly.
         </p>
         <div className="flex gap-4">
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700">
+          <button
+            onClick={() => navigate('/signup')}
+            className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700">
             Get Started Free
           </button>
-          <button className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-50">
+          <button
+            onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
+            className="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-50">
             Learn More
           </button>
         </div>
       </div>
 
-      <div className="bg-white py-16 px-8">
+      <div id="features" className="bg-white py-16 px-8">
         <h3 className="text-3xl font-bold text-center text-gray-800 mb-12">Why Choose JobAI?</h3>
         <div className="flex flex-col md:flex-row justify-center gap-8 max-w-5xl mx-auto">
 
@@ -57,6 +71,7 @@ function LandingPage() {
             <h4 className="text-xl font-bold text-gray-800 mb-2">Track Applications</h4>
             <p className="text-gray-500">See all your job applications and their status in one dashboard.</p>
           </div>
+
         </div>
       </div>
 
