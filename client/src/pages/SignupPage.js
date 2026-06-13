@@ -6,13 +6,38 @@ function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('jobseeker');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSignup = () => {
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Password:', password);
-    console.log('Role:', role);
+  const handleSignup = async () => {
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, role }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || 'Signup failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Save token and user info
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -21,6 +46,12 @@ function SignupPage() {
 
         <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">Create Account 🚀</h2>
         <p className="text-gray-500 text-center mb-8">Join JobAI and find your dream job</p>
+
+        {error && (
+          <div className="mb-4 bg-red-100 text-red-700 text-sm px-4 py-2 rounded-lg text-center">
+            {error}
+          </div>
+        )}
 
         <div className="mb-5">
           <label className="block text-gray-700 font-medium mb-2">Full Name</label>
@@ -69,9 +100,10 @@ function SignupPage() {
 
         <button
           onClick={handleSignup}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-60"
         >
-          Create Account
+          {loading ? 'Creating account...' : 'Create Account'}
         </button>
 
         <p className="text-center text-gray-500 mt-6">
