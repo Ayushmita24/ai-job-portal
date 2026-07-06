@@ -128,6 +128,7 @@ function DashboardPage() {
           ].map((stat, i) => (
             <div
               key={i}
+              onClick={() => i === 0 && navigate('/jobs')}
               className="rounded-2xl p-6 transition-all"
               style={{
                 background: 'rgba(180,210,255,0.05)',
@@ -163,6 +164,7 @@ function DashboardPage() {
             ].map((item, i) => (
               <div
                 key={i}
+                onClick={() => i === 0 && navigate('/jobs')}
                 className="rounded-2xl p-6 cursor-pointer transition-all flex items-start gap-4"
                 style={{
                   background: 'rgba(42,111,196,0.08)',
