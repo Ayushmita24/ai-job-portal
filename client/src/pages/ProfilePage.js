@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
 function ProfilePage() {
+  const [isExisting, setIsExisting] = useState(false);
   const [form, setForm] = useState({
     bio: '',
     skills: '',
@@ -16,9 +17,27 @@ function ProfilePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) { navigate('/login'); return; }
-  }, [navigate]);
+  const token = localStorage.getItem('token');
+  if (!token) { navigate('/login'); return; }
+
+  fetch('http://localhost:5000/api/profile', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data._id) {
+  setIsExisting(true);
+  setForm({
+    bio: data.bio || '',
+    skills: data.skills.join(', '),
+    experience: data.experience || '',
+    education: data.education || '',
+    location: data.location || '',
+  });
+}
+    })
+    .catch(() => {});
+}, [navigate]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -138,7 +157,7 @@ function ProfilePage() {
             disabled={loading}
             className="w-full py-3 rounded-full text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors disabled:opacity-50"
           >
-            {loading ? 'Saving...' : 'Save Profile'}
+            {loading ? 'Saving...' : isExisting ? 'Update Profile' : 'Save Profile'}
           </button>
 
         </div>
