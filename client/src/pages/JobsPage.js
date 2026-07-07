@@ -159,6 +159,7 @@ function JobsPage() {
                   key={job._id}
                   className="rounded-2xl p-6 cursor-pointer transition-all flex flex-col gap-4"
                   style={{ background: 'rgba(180,210,255,0.05)', border: '0.5px solid rgba(180,210,255,0.12)' }}
+                  onClick={() => navigate(`/jobs/${job._id}`)}
                   onMouseEnter={e => { e.currentTarget.style.background = 'rgba(180,210,255,0.09)'; e.currentTarget.style.borderColor = 'rgba(180,210,255,0.25)'; e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.3)' }}
                   onMouseLeave={e => { e.currentTarget.style.background = 'rgba(180,210,255,0.05)'; e.currentTarget.style.borderColor = 'rgba(180,210,255,0.12)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
                 >
