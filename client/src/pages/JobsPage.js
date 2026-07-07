@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 function JobsPage() {
   const [jobs, setJobs] = useState([]);
@@ -9,32 +10,15 @@ function JobsPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Protect route
     const token = localStorage.getItem('token');
     if (!token) { navigate('/login'); return; }
 
-    // Fetch jobs
-    const fetchJobs = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/jobs');
-        const data = await res.json();
-        setJobs(data);
-      } catch (err) {
-        console.error('Failed to fetch jobs:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchJobs();
+    fetch('http://localhost:5000/api/jobs')
+      .then(res => res.json())
+      .then(data => { setJobs(data); setLoading(false); })
+      .catch(() => setLoading(false));
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
-
-  // Filter + search logic
   const filtered = jobs.filter(job => {
     const matchSearch =
       job.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -45,64 +29,24 @@ function JobsPage() {
   });
 
   const typeColors = {
-    'Full-time': { bg: 'rgba(42,111,196,0.15)', color: '#7eb8f7', border: 'rgba(126,184,247,0.3)' },
-    'Remote': { bg: 'rgba(50,180,120,0.12)', color: '#6edba8', border: 'rgba(110,219,168,0.3)' },
-    'Internship': { bg: 'rgba(180,120,255,0.12)', color: '#c8a0ff', border: 'rgba(200,160,255,0.3)' },
-    'Part-time': { bg: 'rgba(255,180,50,0.12)', color: '#ffd080', border: 'rgba(255,208,128,0.3)' },
+    'Full-time': 'text-blue-300 bg-blue-500/10 border-blue-400/20',
+    'Remote':    'text-green-300 bg-green-500/10 border-green-400/20',
+    'Internship':'text-purple-300 bg-purple-500/10 border-purple-400/20',
+    'Part-time': 'text-yellow-300 bg-yellow-500/10 border-yellow-400/20',
   };
 
   return (
-    <div
-      className="min-h-screen relative overflow-hidden"
-      style={{ background: 'linear-gradient(150deg,#050d1a 0%,#071428 50%,#091b38 100%)' }}
-    >
-      {/* Glow orbs */}
-      <div style={{ position: 'absolute', width: '500px', height: '500px', borderRadius: '50%', top: '-150px', right: '-100px', background: 'radial-gradient(circle, rgba(42,111,196,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', width: '400px', height: '400px', borderRadius: '50%', bottom: '-100px', left: '-100px', background: 'radial-gradient(circle, rgba(126,184,247,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
+    <div className="min-h-screen bg-gradient-to-br from-[#050d1a] via-[#071428] to-[#091b38]">
+      <Navbar active="jobs" />
 
-      {/* Navbar */}
-      <nav className="flex items-center justify-between px-8 py-4 relative z-10" style={{ borderBottom: '0.5px solid rgba(180,210,255,0.1)' }}>
-        <div
-          className="px-4 py-2 rounded-full text-sm font-medium cursor-pointer"
-          style={{ background: 'rgba(42,111,196,0.2)', border: '0.5px solid rgba(126,184,247,0.3)', color: '#7eb8f7' }}
-          onClick={() => navigate('/dashboard')}
-        >
-          ✦ JobAI
-        </div>
-        <div className="flex items-center gap-6">
-          <span className="text-sm font-medium" style={{ color: '#7eb8f7' }}>Jobs</span>
-          <span
-            className="text-sm cursor-pointer transition-colors"
-            style={{ color: 'rgba(184,216,255,0.45)' }}
-            onClick={() => navigate('/dashboard')}
-            onMouseEnter={e => e.target.style.color = '#c8deff'}
-            onMouseLeave={e => e.target.style.color = 'rgba(184,216,255,0.45)'}
-          >
-            Dashboard
-          </span>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 rounded-full text-sm transition-all"
-            style={{ border: '0.5px solid rgba(180,210,255,0.2)', color: 'rgba(184,216,255,0.6)', background: 'transparent' }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,100,100,0.4)'; e.currentTarget.style.color = '#ffaaaa'; e.currentTarget.style.background = 'rgba(255,100,100,0.08)' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(180,210,255,0.2)'; e.currentTarget.style.color = 'rgba(184,216,255,0.6)'; e.currentTarget.style.background = 'transparent' }}
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
-
-      {/* Main */}
-      <main className="relative z-10 px-8 py-10">
+      <main className="px-8 py-10">
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-medium mb-2" style={{ color: '#e4f0ff' }}>
-            Browse <span style={{ color: '#7eb8f7' }}>Jobs</span>
+          <h1 className="text-3xl font-medium text-white/90 mb-1">
+            Browse <span className="text-blue-300">Jobs</span>
           </h1>
-          <p className="text-sm" style={{ color: 'rgba(184,216,255,0.4)' }}>
-            {filtered.length} jobs available — find your perfect match
-          </p>
+          <p className="text-sm text-white/40">{filtered.length} jobs available</p>
         </div>
 
         {/* Search + Filter */}
@@ -112,22 +56,18 @@ function JobsPage() {
             placeholder="Search by title, company or skill..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="flex-1 rounded-xl px-4 py-3 text-sm outline-none transition-all"
-            style={{ background: 'rgba(180,210,255,0.06)', border: '0.5px solid rgba(180,210,255,0.15)', color: '#e4f0ff' }}
-            onFocus={e => e.target.style.borderColor = 'rgba(126,184,247,0.55)'}
-            onBlur={e => e.target.style.borderColor = 'rgba(180,210,255,0.15)'}
+            className="flex-1 rounded-xl px-4 py-3 text-sm bg-white/[0.04] border border-white/10 text-white/80 outline-none focus:border-blue-400/50 transition-colors placeholder:text-white/20"
           />
           <div className="flex gap-2">
             {['All', 'Full-time', 'Remote', 'Internship', 'Part-time'].map(type => (
               <button
                 key={type}
                 onClick={() => setFilter(type)}
-                className="px-4 py-2 rounded-full text-xs transition-all"
-                style={{
-                  background: filter === type ? 'rgba(42,111,196,0.3)' : 'rgba(180,210,255,0.06)',
-                  border: filter === type ? '0.5px solid rgba(126,184,247,0.5)' : '0.5px solid rgba(180,210,255,0.15)',
-                  color: filter === type ? '#7eb8f7' : 'rgba(184,216,255,0.5)',
-                }}
+                className={`px-4 py-2 rounded-full text-xs border transition-colors ${
+                  filter === type
+                    ? 'bg-blue-500/20 border-blue-400/40 text-blue-300'
+                    : 'bg-white/[0.03] border-white/10 text-white/40 hover:text-white/60'
+                }`}
               >
                 {type}
               </button>
@@ -135,90 +75,60 @@ function JobsPage() {
           </div>
         </div>
 
-        {/* Loading */}
-        {loading && (
-          <div className="text-center py-20" style={{ color: 'rgba(184,216,255,0.4)' }}>
-            Loading jobs...
-          </div>
-        )}
+        {/* States */}
+        {loading && <p className="text-center text-white/30 py-20">Loading jobs...</p>}
+        {!loading && filtered.length === 0 && <p className="text-center text-white/30 py-20">No jobs found.</p>}
 
-        {/* No results */}
-        {!loading && filtered.length === 0 && (
-          <div className="text-center py-20" style={{ color: 'rgba(184,216,255,0.4)' }}>
-            No jobs found for "{search}"
-          </div>
-        )}
-
-        {/* Job cards grid */}
+        {/* Job cards */}
         {!loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map(job => {
-              const tc = typeColors[job.type] || typeColors['Full-time'];
-              return (
-                <div
-                  key={job._id}
-                  className="rounded-2xl p-6 cursor-pointer transition-all flex flex-col gap-4"
-                  style={{ background: 'rgba(180,210,255,0.05)', border: '0.5px solid rgba(180,210,255,0.12)' }}
-                  onClick={() => navigate(`/jobs/${job._id}`)}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(180,210,255,0.09)'; e.currentTarget.style.borderColor = 'rgba(180,210,255,0.25)'; e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.3)' }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(180,210,255,0.05)'; e.currentTarget.style.borderColor = 'rgba(180,210,255,0.12)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
-                >
-                  {/* Top row */}
-                  <div className="flex items-start justify-between">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-medium flex-shrink-0"
-                      style={{ background: 'rgba(42,111,196,0.2)', color: '#7eb8f7' }}
-                    >
-                      {job.company.charAt(0)}
-                    </div>
-                    <span
-                      className="text-xs px-3 py-1 rounded-full"
-                      style={{ background: tc.bg, color: tc.color, border: `0.5px solid ${tc.border}` }}
-                    >
-                      {job.type}
-                    </span>
+            {filtered.map(job => (
+              <div
+                key={job._id}
+                onClick={() => navigate(`/jobs/${job._id}`)}
+                className="rounded-2xl p-6 border border-white/5 bg-white/[0.03] hover:bg-white/[0.06] hover:-translate-y-1 hover:shadow-xl transition-all cursor-pointer flex flex-col gap-4"
+              >
+                {/* Top */}
+                <div className="flex items-start justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center text-sm font-medium">
+                    {job.company.charAt(0)}
                   </div>
-
-                  {/* Job info */}
-                  <div>
-                    <h3 className="font-medium mb-1" style={{ color: '#e4f0ff' }}>{job.title}</h3>
-                    <p className="text-sm mb-1" style={{ color: 'rgba(184,216,255,0.55)' }}>{job.company}</p>
-                    <p className="text-xs" style={{ color: 'rgba(184,216,255,0.35)' }}>📍 {job.location} · {job.experience}</p>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(184,216,255,0.4)' }}>
-                    {job.description.slice(0, 100)}...
-                  </p>
-
-                  {/* Skills */}
-                  <div className="flex flex-wrap gap-2">
-                    {job.skills.slice(0, 3).map((skill, i) => (
-                      <span
-                        key={i}
-                        className="text-xs px-2 py-1 rounded-lg"
-                        style={{ background: 'rgba(126,184,247,0.08)', color: 'rgba(184,216,255,0.6)', border: '0.5px solid rgba(126,184,247,0.15)' }}
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                    {job.skills.length > 3 && (
-                      <span className="text-xs px-2 py-1 rounded-lg" style={{ color: 'rgba(184,216,255,0.35)' }}>
-                        +{job.skills.length - 3} more
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Bottom row */}
-                  <div className="flex items-center justify-between mt-auto pt-2" style={{ borderTop: '0.5px solid rgba(180,210,255,0.08)' }}>
-                    <span className="text-sm font-medium" style={{ color: '#7eb8f7' }}>{job.salary}</span>
-                    <span className="text-xs" style={{ color: 'rgba(184,216,255,0.35)' }}>
-                      View details →
-                    </span>
-                  </div>
+                  <span className={`text-xs px-3 py-1 rounded-full border ${typeColors[job.type]}`}>
+                    {job.type}
+                  </span>
                 </div>
-              );
-            })}
+
+                {/* Info */}
+                <div>
+                  <h3 className="font-medium text-white/90 mb-1">{job.title}</h3>
+                  <p className="text-sm text-white/50 mb-1">{job.company}</p>
+                  <p className="text-xs text-white/30">📍 {job.location} · {job.experience}</p>
+                </div>
+
+                {/* Description */}
+                <p className="text-xs text-white/30 leading-relaxed">
+                  {job.description.slice(0, 100)}...
+                </p>
+
+                {/* Skills */}
+                <div className="flex flex-wrap gap-2">
+                  {job.skills.slice(0, 3).map((skill, i) => (
+                    <span key={i} className="text-xs px-2 py-1 rounded-lg bg-blue-400/[0.08] text-blue-300/70 border border-blue-400/10">
+                      {skill}
+                    </span>
+                  ))}
+                  {job.skills.length > 3 && (
+                    <span className="text-xs text-white/25">+{job.skills.length - 3} more</span>
+                  )}
+                </div>
+
+                {/* Bottom */}
+                <div className="flex items-center justify-between pt-2 border-t border-white/5 mt-auto">
+                  <span className="text-sm font-medium text-blue-300">{job.salary}</span>
+                  <span className="text-xs text-white/25">View details →</span>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </main>
